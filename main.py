@@ -26,3 +26,9 @@ class Bird:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.tilt = 0
+        self.tick_count = 0
+        self.velocity = 0
+        self.height = self.y
+        self.img_count = 0
+        self.img = self.IMG[0]
