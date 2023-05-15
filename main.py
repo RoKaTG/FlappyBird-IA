@@ -81,3 +81,33 @@ class Bird:
         new_rect = rotated_image.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
 
         windows.blit(rotated_image, new_rect.topleft)
+
+def draw_window(win, bird):
+    win.blit(BG_IMG, (0, 0))
+    bird.draw(win)
+    pg.display.update()
+
+def main():
+    pg.init()
+    win = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+    clock = pg.time.Clock()
+    bird = Bird(100, 300)
+
+    run = True
+    while run:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
+                break
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    bird.jump()
+
+        bird.move()
+        draw_window(win, bird)
+        clock.tick(60)
+
+    pg.quit()
+
+if __name__ == "__main__":
+        main()
