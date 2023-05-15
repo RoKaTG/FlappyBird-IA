@@ -103,11 +103,35 @@ class Pipe:
         self.top = self.height - self.PIPE_T.get_height()
         self.bottom = self.height + self.GENERATION
 
+    def move(self):
+        self.x = self.x - self.VELOCITY
 
+    def draw(self, win):
+        win.blit(self.PIPE_T, (self.x, self.top))
+        win.blit(self.PIPE_B, (self.x, self.bottom))
 
+    def get_rects(self):
+        top_rect = self.PIPE_T.get_rect(topleft=(self.x, self.top))
+        bottom_rect = self.PIPE_B.get_rect(topleft=(self.x, self.bottom))
+        return top_rect, bottom_rect
 
-def draw_window(win, bird):
+def check_collision(bird, pipes):
+    bird_rect = bird.img.get_rect(topleft=(bird.x, bird.y))
+
+    for pipe in pipes:
+        top_rect, bottom_rect = pipe.get_rects()
+
+        if bird_rect.colliderect(top_rect) or bird_rect.colliderect(bottom_rect):
+            return True
+
+    return False
+
+def draw_window(win, bird, pipes):
     win.blit(BG_IMG, (0, 0))
+
+    for pipe in pipes:
+        pipe.draw(win)
+
     bird.draw(win)
     pg.display.update()
 
@@ -116,6 +140,7 @@ def main():
     win = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     clock = pg.time.Clock()
     bird = Bird(100, 300)
+    pipes = [Pipe(600)]
 
     run = True
     while run:
@@ -128,7 +153,15 @@ def main():
                     bird.jump()
 
         bird.move()
-        draw_window(win, bird)
+
+        for pipe in pipes:
+            pipe.move()
+
+        if check_collision(bird, pipes):
+            # Collision détectée
+            print("Collision occurred")
+            run = False
+        draw_window(win, bird, pipes)
         clock.tick(60)
 
     pg.quit()
