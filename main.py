@@ -51,10 +51,33 @@ class Bird:
 
         self.y = self.y + distance
 
-        if distance < 0 or self.y < self.height + 50:
+        if distance < 0 or self.y < self.height - 15:
             if self.tilt < self.MAX_ROTATION:
-                self.tilt = self.tilt + 10
+                self.tilt = min(self.tilt + 10, self.MAX_ROTATION)
+        else:
+            if self.tilt > -self.MAX_ROTATION:
+                self.tilt = max(self.tilt - 10, -self.MAX_ROTATION)
 
-        if distance >= 16 or self.y >= self.height + 50:
-            if self.tilt < self.MAX_ROTATION:
-                self.tilt = self.tilt - 10
+    def draw(self,windows):
+        self.img_count = self.img_count + 1
+
+        if self.img_count < self.ANIMATION_TIME:
+            self.img = self.IMG[0]
+        elif self.img_count < self.ANIMATION_TIME * 2:
+            self.img = self.IMG[1]
+        elif self.img_count < self.ANIMATION_TIME * 3:
+            self.img = self.IMG[2]
+        elif self.img_count < self.ANIMATION_TIME * 4:
+            self.img = self.IMG[1]
+        elif self.img_count == self.ANIMATION_TIME * 4 + 1:
+            self.img = self.IMG[0]
+            self.img_count = 0
+
+        if self.tilt <= -80:
+            self.img = self.IMG[1]
+            self.img_count = self.ANIMATION_TIME * 2
+
+        rotated_image = pg.transform.rotate(self.img, self.tilt)
+        new_rect = rotated_image.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
+
+        windows.blit(rotated_image, new_rect.topleft)
