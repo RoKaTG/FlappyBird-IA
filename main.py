@@ -82,6 +82,12 @@ class Bird:
 
         windows.blit(rotated_image, new_rect.topleft)
 
+class Pipe:
+    VELOCITY = 0
+
+
+
+
 def draw_window(win, bird):
     win.blit(BG_IMG, (0, 0))
     bird.draw(win)
