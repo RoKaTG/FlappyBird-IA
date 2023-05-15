@@ -83,7 +83,25 @@ class Bird:
         windows.blit(rotated_image, new_rect.topleft)
 
 class Pipe:
-    VELOCITY = 0
+    GENERATION = 150
+    VELOCITY = 5
+
+    def __init__(self, x):
+        self.x = x
+        self.height = 0
+
+        self.top = 0
+        self.bottom = 0
+        self.PIPE_T = pg.transform.flip(PIPE_IMG, False, True)
+        self.PIPE_B = PIPE_IMG
+
+        self.passed = False
+        self.set_height()
+
+    def set_height(self):
+        self.height = random.randrange(35,400)
+        self.top = self.height - self.PIPE_T.get_height()
+        self.bottom = self.height + self.GENERATION
 
 
 
