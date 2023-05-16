@@ -151,11 +151,13 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
-def draw_window(win, bird, pipes):
+def draw_window(win, bird, pipes, base):
     win.blit(BG_IMG, (0, 0))
 
     for pipe in pipes:
         pipe.draw(win)
+
+    base.draw(win)
 
     bird.draw(win)
     pg.display.update()
@@ -166,6 +168,7 @@ def main():
     clock = pg.time.Clock()
     bird = Bird(100, 300)
     pipes = [Pipe(600)]
+    base = Base(730)
 
     run = True
     while run:
@@ -186,7 +189,7 @@ def main():
             # Collision détectée
             print("Collision occurred")
 
-        draw_window(win, bird, pipes)
+        draw_window(win, bird, pipes, base)
         clock.tick(60)
 
     pg.quit()
