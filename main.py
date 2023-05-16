@@ -127,7 +127,7 @@ def check_collision(bird, pipes):
     return False
 
 class Base:
-    VELOCITY = 5
+    VELOCITY = 4
     WIDTH = BASE_IMG.get_width()
     IMG = BASE_IMG
 
@@ -144,7 +144,7 @@ class Base:
             self.x1 = self.x2 + self.WIDTH
 
         if self.x2 + self.WIDTH < 0:
-            self.x2 = self.x2 = self.VELOCITY
+            self.x2 = self.x1 + self.WIDTH
 
     def draw(self, win):
         win.blit(self.IMG, (self.x1, self.y))
@@ -180,15 +180,24 @@ def main():
                 if event.key == pg.K_SPACE:
                     bird.jump()
 
-        bird.move()
+        #bird.move()
         base.move()
+        remove = []
+        add_pipe = False
 
         for pipe in pipes:
-            pipe.move()
+            if check_collision(bird, pipes):
+                #Collision détectée
+                print("Collision occurred")
 
-        if check_collision(bird, pipes):
-            # Collision détectée
-            print("Collision occurred")
+            if pipe.x + pipe.PIPE_T.get_width() < 0:
+                remove.append(pipe)
+
+            if not pipe.passed and pipe.x < bird.x:
+                pipe.passed = True
+                add_pipe = True
+
+            pipe.move()
 
         draw_window(win, bird, pipes, base)
         clock.tick(60)
