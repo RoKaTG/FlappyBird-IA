@@ -126,6 +126,31 @@ def check_collision(bird, pipes):
 
     return False
 
+class Base:
+    VELOCITY = 5
+    WIDTH = BASE_IMG.get_width()
+    IMG = BASE_IMG
+
+    def __init__(self, y):
+        self.y = y
+        self.x1 = 0
+        self.x2 = self.WIDTH
+
+    def move(self):
+        self.x1 = self.x1 - self.VELOCITY
+        self.x2 = self.x2 - self.VELOCITY
+
+        if self.x1 + self.WIDTH < 0:
+            self.x1 = self.x2 + self.WIDTH
+
+        if self.x2 + self.WIDTH < 0:
+            self.x2 = self.x2 = self.VELOCITY
+
+    def draw(self, win):
+        win.blit(self.IMG, (self.x1, self.y))
+        win.blit(self.IMG, (self.x2, self.y))
+
+
 def draw_window(win, bird, pipes):
     win.blit(BG_IMG, (0, 0))
 
@@ -160,7 +185,7 @@ def main():
         if check_collision(bird, pipes):
             # Collision détectée
             print("Collision occurred")
-            run = False
+
         draw_window(win, bird, pipes)
         clock.tick(60)
 
