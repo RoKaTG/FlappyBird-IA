@@ -166,9 +166,12 @@ def main():
     pg.init()
     win = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     clock = pg.time.Clock()
+
     bird = Bird(100, 300)
     pipes = [Pipe(600)]
     base = Base(730)
+
+    score = 0
 
     run = True
     while run:
@@ -198,7 +201,9 @@ def main():
                 add_pipe = True
 
             pipe.move()
-
+        if add_pipe:
+            score = score + 1
+            pipes.append(Pipe(600))
         draw_window(win, bird, pipes, base)
         clock.tick(60)
 
