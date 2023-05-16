@@ -181,6 +181,7 @@ def main():
                     bird.jump()
 
         bird.move()
+        base.move()
 
         for pipe in pipes:
             pipe.move()
