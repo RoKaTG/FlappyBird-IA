@@ -5,7 +5,7 @@ import random
 import pygame as pg
 import neat as nt
 
-WIN_WIDTH = 600
+WIN_WIDTH = 550
 WIN_HEIGHT = 800
 
 
@@ -204,6 +204,13 @@ def main():
         if add_pipe:
             score = score + 1
             pipes.append(Pipe(600))
+
+        for r in remove:
+            pipes.remove(r)
+
+        if bird.y +bird.img.get_height() >= WIN_HEIGHT - 40:
+            run = False
+
         draw_window(win, bird, pipes, base)
         clock.tick(60)
 
