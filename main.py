@@ -5,6 +5,8 @@ import random
 import pygame as pg
 import neat as nt
 
+pg.font.init()
+
 WIN_WIDTH = 550
 WIN_HEIGHT = 800
 
@@ -16,6 +18,7 @@ PIPE_IMG = pg.transform.scale2x(pg.image.load(os.path.join("imgs","pipe.png")))
 BASE_IMG = pg.transform.scale2x(pg.image.load(os.path.join("imgs","base.png")))
 BG_IMG = pg.transform.scale2x(pg.image.load(os.path.join("imgs","bg.png")))
 
+SCORE = pg.font.SysFont("TimesNewRoman", 50, bold = True, italic = False)
 
 class Bird:
     IMG = BIRD_IMG
@@ -151,12 +154,14 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
-def draw_window(win, bird, pipes, base):
+def draw_window(win, bird, pipes, base, score):
     win.blit(BG_IMG, (0, 0))
 
     for pipe in pipes:
         pipe.draw(win)
 
+    text = SCORE.render("Score: " + str(score), 1, (255, 255, 255))
+    win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
     base.draw(win)
 
     bird.draw(win)
@@ -183,13 +188,14 @@ def main():
                 if event.key == pg.K_SPACE:
                     bird.jump()
 
-        #bird.move()
+        bird.move()
         base.move()
         remove = []
         add_pipe = False
 
         for pipe in pipes:
             if check_collision(bird, pipes):
+                run = False
                 #Collision détectée
                 print("Collision occurred")
 
@@ -208,10 +214,10 @@ def main():
         for r in remove:
             pipes.remove(r)
 
-        if bird.y +bird.img.get_height() >= WIN_HEIGHT - 40:
+        if bird.y + bird.img.get_height() >= WIN_HEIGHT - 40 :
             run = False
 
-        draw_window(win, bird, pipes, base)
+        draw_window(win, bird, pipes, base, score)
         clock.tick(60)
 
     pg.quit()
