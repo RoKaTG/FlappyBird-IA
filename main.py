@@ -167,16 +167,27 @@ def draw_window(win, bird, pipes, base, score):
     bird.draw(win)
     pg.display.update()
 
-def main():
+def main(gen, config):
     pg.init()
     win = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     clock = pg.time.Clock()
 
-    bird = Bird(100, 300)
+    birds = []
     pipes = [Pipe(600)]
     base = Base(730)
 
     score = 0
+
+    network = []
+    ge = []
+
+    for g in gen:
+        networks = neat.nn.FeedForwardNetwork(g, config)
+        network.append((networks))
+        birds.append(Bird(230, 350))
+        g.fitness = 0
+        ge.append(g)
+
 
     run = True
     while run:
@@ -194,28 +205,39 @@ def main():
         add_pipe = False
 
         for pipe in pipes:
-            if check_collision(bird, pipes):
-                run = False
-                #Collision détectée
-                print("Collision occurred")
+            for x, bird in enumerate(birds):
+                if check_collision(bird, pipes):
+                    ge[x].fitness -= 1
+                    birds.pop(x)
+                    network.pop(x)
+                    ge.pop(x)
+                    #run = False
+                    #Collision détectée
+                    print("Collision occurred")
 
+                if not pipe.passed and pipe.x < bird.x:
+                    pipe.passed = True
+                    add_pipe = True
             if pipe.x + pipe.PIPE_T.get_width() < 0:
                 remove.append(pipe)
-
-            if not pipe.passed and pipe.x < bird.x:
-                pipe.passed = True
-                add_pipe = True
-
             pipe.move()
+
         if add_pipe:
             score = score + 1
+            for g in ge:
+                g.fitness += 5
             pipes.append(Pipe(600))
 
         for r in remove:
             pipes.remove(r)
 
-        if bird.y + bird.img.get_height() >= WIN_HEIGHT - 40 :
-            run = False
+        for x, bird in enumerate(birds):
+            if bird.y + bird.img.get_height() >= WIN_HEIGHT - 40:
+                birds.pop(x)
+                network.pop(x)
+                ge.pop(x)
+                #run = False
+                pass
 
         draw_window(win, bird, pipes, base, score)
         clock.tick(60)
@@ -225,6 +247,13 @@ def main():
 def run(config_path):
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                 neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+    population = neat.Population(config)
+    population.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    population.add_reporter(stats)
+
+    winner = population.run(main,50)
+
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
