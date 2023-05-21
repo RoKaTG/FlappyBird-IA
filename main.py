@@ -3,7 +3,7 @@ import os
 import random
 
 import pygame as pg
-import neat as nt
+import neat
 
 pg.font.init()
 
@@ -222,5 +222,12 @@ def main():
 
     pg.quit()
 
+def run(config_path):
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                                neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+
 if __name__ == "__main__":
-        main()
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, "config.txt")
+    run(config_path)
+
