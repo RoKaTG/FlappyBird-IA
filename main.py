@@ -44,7 +44,7 @@ class Bird:
     def move(self):
         self.tick_count = self.tick_count + 1
 
-        distance = self.velocity * self.tick_count + 1.5 * self.tick_count ** 2
+        distance = self.velocity * (self.tick_count) + 0.5 * (3) * (self.tick_count) ** 2
 
         if distance >= 16:
             distance = 16
@@ -86,7 +86,7 @@ class Bird:
         windows.blit(rotated_image, new_rect.topleft)
 
 class Pipe:
-    GENERATION = 150
+    GENERATION = 175
     VELOCITY = 5
 
     def __init__(self, x):
@@ -154,7 +154,7 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
-def draw_window(win, bird, pipes, base, score):
+def draw_window(win, birds, pipes, base, score):
     win.blit(BG_IMG, (0, 0))
 
     for pipe in pipes:
@@ -164,7 +164,8 @@ def draw_window(win, bird, pipes, base, score):
     win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
     base.draw(win)
 
-    bird.draw(win)
+    for bird in birds:
+        bird.draw(win)
     pg.display.update()
 
 def main(gen, config):
@@ -181,8 +182,8 @@ def main(gen, config):
     network = []
     ge = []
 
-    for g in gen:
-        networks = neat.nn.FeedForwardNetwork(g, config)
+    for _, g in gen:
+        networks = neat.nn.FeedForwardNetwork.create(g, config)
         network.append((networks))
         birds.append(Bird(230, 350))
         g.fitness = 0
@@ -194,12 +195,24 @@ def main(gen, config):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
-                break
-            elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
-                    bird.jump()
+                pg.quit()
+        pipe_ind = 0
+        if len(birds) > 0:
+            if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_T.get_width():
+                pipe_ind = 1
+        else:
+            run = False
+            break
 
-        bird.move()
+        for x, bird in enumerate(birds):
+            bird.move()
+            ge[x].fitness += 0.1
+
+            output = network[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
+
+            if output[0] > 0.5:
+                bird.jump()
+
         base.move()
         remove = []
         add_pipe = False
@@ -211,9 +224,6 @@ def main(gen, config):
                     birds.pop(x)
                     network.pop(x)
                     ge.pop(x)
-                    #run = False
-                    #Collision détectée
-                    print("Collision occurred")
 
                 if not pipe.passed and pipe.x < bird.x:
                     pipe.passed = True
@@ -232,17 +242,14 @@ def main(gen, config):
             pipes.remove(r)
 
         for x, bird in enumerate(birds):
-            if bird.y + bird.img.get_height() >= WIN_HEIGHT - 40:
+            if bird.y + bird.img.get_height() >= WIN_HEIGHT - 40 or bird.y < 0:
                 birds.pop(x)
                 network.pop(x)
                 ge.pop(x)
-                #run = False
-                pass
 
-        draw_window(win, bird, pipes, base, score)
-        clock.tick(60)
+        draw_window(win, birds, pipes, base, score)
+        clock.tick(30)
 
-    pg.quit()
 
 def run(config_path):
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
