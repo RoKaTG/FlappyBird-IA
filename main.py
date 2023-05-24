@@ -258,7 +258,6 @@ def run(config_path):
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
-
     winner = population.run(main, 50)
 
 
